@@ -1,0 +1,79 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DIContainer
+{
+    public class NickiCollection : IServiceCollection        
+    {
+        public static Dictionary<Type, ServiceDescriptor> TypeServiceDescriptorDict;
+
+        public NickiCollection()
+        {
+            TypeServiceDescriptorDict = new Dictionary<Type, ServiceDescriptor>();
+        }
+
+        public ServiceDescriptor this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public int Count => TypeServiceDescriptorDict.Count;
+
+        public bool IsReadOnly => throw new NotImplementedException();
+
+        public void Add(ServiceDescriptor item)
+        {
+            if (!TypeServiceDescriptorDict.ContainsKey(item.ServiceType))
+                TypeServiceDescriptorDict.Add(item.ServiceType, item);
+            else
+                TypeServiceDescriptorDict[item.ServiceType] = item;
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(ServiceDescriptor item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CopyTo(ServiceDescriptor[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<ServiceDescriptor> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int IndexOf(ServiceDescriptor item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, ServiceDescriptor item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(ServiceDescriptor item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

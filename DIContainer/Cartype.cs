@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DIContainer
 {
-    public enum EnumDelegateType
+    internal class Cartype
     {
-        None,
-        Action,
-        Func
+        public string typename { get ; set; }
     }
 }

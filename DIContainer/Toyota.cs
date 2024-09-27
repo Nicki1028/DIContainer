@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace DIContainer
 {
-    public enum EnumAddType
+    internal class Toyota : Car
     {
-        Singleton,
-        Transient
+        public override void ShowInfo()
+        {
+            Console.WriteLine("I am Toyota");
+        }
     }
-    
 }
