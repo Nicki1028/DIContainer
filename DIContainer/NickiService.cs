@@ -18,9 +18,36 @@ namespace DIContainer
         public NickiService()
         {
            Collection = new NickiCollection();
+           AddSingleton<PresenterFactory>();
         }      
 
-        public void Add<T, T2>(ServiceLifetime serviceLifetime) where T : class where T2 : class, T, new()
+        public void AddSingleton<T, T2>()where T : class where T2 : class,T
+        {
+            Add<T, T2>(ServiceLifetime.Singleton);
+        }
+        public void AddSingleton<T>() where T : class
+        {
+            Add<T>(ServiceLifetime.Singleton);
+        }
+        public void AddTransient<T>(Func<IServiceProvider, T> factory) where T : class
+        {
+            Add<T>(ServiceLifetime.Transient, factory);
+        }
+        public void AddTransient<T, T2>() where T : class where T2 : class, T
+        {
+            Add<T, T2>(ServiceLifetime.Transient);
+        }
+        public void AddTransient<T>() where T : class
+        {
+            Add<T>(ServiceLifetime.Transient);
+        }
+        public void AddSingleton<T>(Func<IServiceProvider, T> factory) where T : class
+        {
+            Add<T>(ServiceLifetime.Transient, factory);
+        }
+
+
+        public void Add<T, T2>(ServiceLifetime serviceLifetime) where T : class where T2 : class
         {
             Type serviceType = typeof(T);
             Type implementationType = typeof(T2);
@@ -48,41 +75,41 @@ namespace DIContainer
                     break;
             }
         }
-        public void Add<T, T2>(ServiceLifetime serviceLifetime, Action<T> configure = null) where T : class where T2 : class, T, new()
-        {
+        //public void Add<T, T2>(ServiceLifetime serviceLifetime, Action<T> configure = null) where T : class where T2 : class
+        //{
                       
-            switch (serviceLifetime)
-            {
-                case ServiceLifetime.Singleton:
-                    //var instance = new T2();                  
-                    //configure?.Invoke(instance);
-                    //saveData.configure = configure;
-                    //saveData.AddType = EnumAddType.Singleton;
-                    //saveData.DelegateType = configure != null ? EnumDelegateType.Action: EnumDelegateType.None;                  
-                    //saveData.data = instance;
-                    Collection.Add(new ServiceDescriptor(typeof(T), serviceProvider =>
-                    {
-                        var instance = new T2(); 
-                        configure?.Invoke(instance); 
-                        return instance; 
-                    }, ServiceLifetime.Singleton));
+        //    switch (serviceLifetime)
+        //    {
+        //        case ServiceLifetime.Singleton:
+        //            //var instance = new T2();                  
+        //            //configure?.Invoke(instance);
+        //            //saveData.configure = configure;
+        //            //saveData.AddType = EnumAddType.Singleton;
+        //            //saveData.DelegateType = configure != null ? EnumDelegateType.Action: EnumDelegateType.None;                  
+        //            //saveData.data = instance;
+        //            Collection.Add(new ServiceDescriptor(typeof(T), serviceProvider =>
+        //            {
+        //                var instance = new T2(); 
+        //                configure?.Invoke(instance); 
+        //                return instance; 
+        //            }, ServiceLifetime.Singleton));
                     
-                    break;
-                case ServiceLifetime.Transient:
-                    //saveData.AddType = EnumAddType.Transient;
-                    //saveData.DelegateType = configure != null ? EnumDelegateType.Action : EnumDelegateType.None;
-                    //saveData.configure = configure;
-                    //saveData.data = null;
-                    //saveData.datatemp = new T2();
-                    Collection.Add(new ServiceDescriptor(typeof(T), serviceProvider =>
-                    {
-                        var instance = new T2();
-                        configure?.Invoke(instance);
-                        return instance;
-                    }, ServiceLifetime.Transient));
-                    break;
-            }
-        }
+        //            break;
+        //        case ServiceLifetime.Transient:
+        //            //saveData.AddType = EnumAddType.Transient;
+        //            //saveData.DelegateType = configure != null ? EnumDelegateType.Action : EnumDelegateType.None;
+        //            //saveData.configure = configure;
+        //            //saveData.data = null;
+        //            //saveData.datatemp = new T2();
+        //            Collection.Add(new ServiceDescriptor(typeof(T), serviceProvider =>
+        //            {
+        //                var instance = new T2();
+        //                configure?.Invoke(instance);
+        //                return instance;
+        //            }, ServiceLifetime.Transient));
+        //            break;
+        //    }
+        //}
         public void Add<T>(ServiceLifetime serviceLifetime, Func<IServiceProvider,T> factory) where T : class
         {         
             switch (serviceLifetime)
@@ -107,6 +134,7 @@ namespace DIContainer
         public void AddLogging(Action<ILoggingBuilder> configure)
         {
             Collection.AddLogging(configure);
+            
         }
         public IServiceProvider BuildServiceProvider()
         {

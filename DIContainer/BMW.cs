@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,19 @@ namespace DIContainer
 {
     internal class BMW:Car
     {
+        Cartype Cartype;
+       
+
+
+        public BMW()
+        {
+            
+        }
+
+     
         public override void ShowInfo()
         {
-            Console.WriteLine("I am BMW");
+            Console.WriteLine("I am " + this.Cartype.typename);
         }
     }
 }

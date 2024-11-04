@@ -15,9 +15,10 @@ namespace DIContainer
         public NickiCollection()
         {
             TypeServiceDescriptorDict = new Dictionary<Type, ServiceDescriptor>();
+            
         }
 
-        public ServiceDescriptor this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ServiceDescriptor this[int index] { get => GetDescriptorDict(index); set => throw new NotImplementedException(); }
 
         public int Count => TypeServiceDescriptorDict.Count;
 
@@ -74,6 +75,18 @@ namespace DIContainer
         IEnumerator IEnumerable.GetEnumerator()
         {
             throw new NotImplementedException();
+        }
+
+        private ServiceDescriptor GetDescriptorDict(int index)
+        {
+            int i = 0;
+            foreach (var item in TypeServiceDescriptorDict)
+            {
+                if (index == i)
+                    return item.Value;
+                i++;
+            }
+            return null;
         }
     }
 }
