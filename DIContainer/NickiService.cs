@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Services.Description;
+using System.Windows.Forms;
+using DIContainer.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -17,11 +21,11 @@ namespace DIContainer
 
         public NickiService()
         {
-           Collection = new NickiCollection();
-           AddSingleton<PresenterFactory>();
-        }      
+            Collection = new NickiCollection();
+            AddSingleton<PresenterFactory>();
+        }
 
-        public void AddSingleton<T, T2>()where T : class where T2 : class,T
+        public void AddSingleton<T, T2>() where T : class where T2 : class, T
         {
             Add<T, T2>(ServiceLifetime.Singleton);
         }
@@ -59,9 +63,9 @@ namespace DIContainer
                 case ServiceLifetime.Transient:
                     Collection.Add(new ServiceDescriptor(serviceType, implementationType, ServiceLifetime.Transient));
                     break;
-            }           
+            }
         }
-        public void Add<T>(ServiceLifetime serviceLifetime) where T : class 
+        public void Add<T>(ServiceLifetime serviceLifetime) where T : class
         {
             Type serviceType = typeof(T);
             Type implementationType = typeof(T);
@@ -77,7 +81,7 @@ namespace DIContainer
         }
         //public void Add<T, T2>(ServiceLifetime serviceLifetime, Action<T> configure = null) where T : class where T2 : class
         //{
-                      
+
         //    switch (serviceLifetime)
         //    {
         //        case ServiceLifetime.Singleton:
@@ -93,7 +97,7 @@ namespace DIContainer
         //                configure?.Invoke(instance); 
         //                return instance; 
         //            }, ServiceLifetime.Singleton));
-                    
+
         //            break;
         //        case ServiceLifetime.Transient:
         //            //saveData.AddType = EnumAddType.Transient;
@@ -110,8 +114,8 @@ namespace DIContainer
         //            break;
         //    }
         //}
-        public void Add<T>(ServiceLifetime serviceLifetime, Func<IServiceProvider,T> factory) where T : class
-        {         
+        public void Add<T>(ServiceLifetime serviceLifetime, Func<IServiceProvider, T> factory) where T : class
+        {
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
@@ -121,7 +125,7 @@ namespace DIContainer
                     //saveData.DelegateType = factory != null ? EnumDelegateType.Func :EnumDelegateType.None;
                     Collection.Add(new ServiceDescriptor(typeof(T), factory, ServiceLifetime.Singleton));
                     break;
-                    
+
                 case ServiceLifetime.Transient:
                     //saveData.configure = factory;
                     //saveData.AddType = EnumAddType.Transient;
@@ -134,11 +138,13 @@ namespace DIContainer
         public void AddLogging(Action<ILoggingBuilder> configure)
         {
             Collection.AddLogging(configure);
-            
+
         }
         public IServiceProvider BuildServiceProvider()
         {
-            return new ServiceProviderbyNicki(NickiCollection.TypeServiceDescriptorDict);
+            IServiceProvider provider = new ServiceProviderbyNicki(NickiCollection.TypeServiceDescriptorDict);
+            NickiCollection.TypeServiceDescriptorDict[typeof(IServiceProvider)] = new List<ServiceDescriptor>() { new ServiceDescriptor(typeof(IServiceProvider), provider) };
+            return provider;
         }
         public T GetInstance<T>()
         {
@@ -162,7 +168,15 @@ namespace DIContainer
 
         public void Add(ServiceDescriptor item)
         {
-           // throw new NotImplementedException();
+            if (!NickiCollection.TypeServiceDescriptorDict.ContainsKey(item.ServiceType))
+            {
+                NickiCollection.TypeServiceDescriptorDict[item.ServiceType] = new List<ServiceDescriptor>() { item };
+
+            }
+            else
+            {
+                NickiCollection.TypeServiceDescriptorDict[item.ServiceType].Add(item);
+            }
         }
 
         public void Clear()
@@ -189,5 +203,97 @@ namespace DIContainer
         {
             throw new NotImplementedException();
         }
+        public void AutoRegister(IEnumerable<System.Reflection.TypeInfo> types)
+        {
+            foreach (var type in types)
+            {
+                if (type.CustomAttributes.Any(x => x.AttributeType != typeof(Signleton) &&  x.AttributeType != typeof(Transient)))
+                {
+                    continue;
+                }
+
+
+
+                if (type.CustomAttributes.Any(x => x.AttributeType == typeof(Signleton)))
+                {
+                    if (type.BaseType != null && type.BaseType != typeof(Object))
+                    {
+                        Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(type.BaseType, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+                    }
+                    else if (type.ImplementedInterfaces != null && type.ImplementedInterfaces.Any())
+                    {
+                        foreach (var data in type.ImplementedInterfaces)
+                        {
+
+                            Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(data, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+                        }
+                    }
+                    else
+                    {
+                        Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(type, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+                    }
+
+                }
+                else
+                {
+                    if (type.BaseType != null && type.BaseType != typeof(Object))
+                    {
+                        Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(type.BaseType, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                    }
+                    else if (type.ImplementedInterfaces != null && type.ImplementedInterfaces.Any())
+                    {
+                        foreach (var data in type.ImplementedInterfaces)
+                        {
+
+                            Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(data, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                        }
+                    }
+                    else
+                    {
+                        Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(type, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                    }
+
+                }
+            }
+        }
+        public void AutoRegisterMVPcomponent(IEnumerable<System.Reflection.TypeInfo> types)
+        {
+            foreach (var type in types)
+            {
+                if (type.BaseType == typeof(UserControl))
+                {
+
+                    if (type.ImplementedInterfaces != null && type.ImplementedInterfaces.Any())
+                    {
+                        foreach (var data in type.ImplementedInterfaces)
+                        {
+                            Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(data, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                        }
+                    }
+                    else
+                    {
+                        Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(type, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                    }
+
+
+                    if (types.Any(x => x.Name == type.Name))
+                    {
+                        int index = type.Name.IndexOf("Component");
+                        if (index != -1)
+                        {
+                            string presenter = type.Name.Substring(0, index) + "Presenter";
+                            var presenterType = types.First(x => x.Name == presenter);
+                            if (presenterType.ImplementedInterfaces != null)
+                            {
+                                Collection.Add(new Microsoft.Extensions.DependencyInjection.ServiceDescriptor(presenterType, type, Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+
     }
 }

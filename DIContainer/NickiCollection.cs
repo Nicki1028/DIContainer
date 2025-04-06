@@ -10,11 +10,11 @@ namespace DIContainer
 {
     public class NickiCollection : IServiceCollection        
     {
-        public static Dictionary<Type, ServiceDescriptor> TypeServiceDescriptorDict;
+        public static Dictionary<Type, List<ServiceDescriptor>> TypeServiceDescriptorDict;
 
         public NickiCollection()
         {
-            TypeServiceDescriptorDict = new Dictionary<Type, ServiceDescriptor>();
+            TypeServiceDescriptorDict = new Dictionary<Type, List<ServiceDescriptor>>();
             
         }
 
@@ -26,10 +26,15 @@ namespace DIContainer
 
         public void Add(ServiceDescriptor item)
         {
-            if (!TypeServiceDescriptorDict.ContainsKey(item.ServiceType))
-                TypeServiceDescriptorDict.Add(item.ServiceType, item);
+           if (!TypeServiceDescriptorDict.ContainsKey(item.ServiceType))
+            {
+                TypeServiceDescriptorDict[item.ServiceType] = new List<ServiceDescriptor>() { item};
+
+            }
             else
-                TypeServiceDescriptorDict[item.ServiceType] = item;
+            {
+                TypeServiceDescriptorDict[item.ServiceType].Add(item);
+            }
         }
 
         public void Clear()
@@ -83,7 +88,7 @@ namespace DIContainer
             foreach (var item in TypeServiceDescriptorDict)
             {
                 if (index == i)
-                    return item.Value;
+                    return item.Value.Last();
                 i++;
             }
             return null;

@@ -16,9 +16,12 @@ namespace DIContainer
 {
     public class ServiceProviderbyNicki : IServiceProvider
     {
-        public Dictionary<Type, ServiceDescriptor> _typeServiceDescriptorDict;
+        // TODO:
+        // 1.要改成允許放入多個子類別
+        // 2.自動註冊(利用Attribute自動註冊) / MVP版本的註冊
+        public Dictionary<Type, List<ServiceDescriptor>> _typeServiceDescriptorDict;
         public Dictionary<Type, object> _singletoninstance = new Dictionary<Type, object>();
-        public ServiceProviderbyNicki(Dictionary<Type, ServiceDescriptor> typeServiceDescriptorDict)
+        public ServiceProviderbyNicki(Dictionary<Type, List<ServiceDescriptor>> typeServiceDescriptorDict)
         {
             _typeServiceDescriptorDict = typeServiceDescriptorDict;
         }
@@ -28,12 +31,12 @@ namespace DIContainer
             if (serviceType.IsEnumerable())
             {
                 var serviceTypeInsideIEnurmerable = serviceType.GetGenericArguments()[0];
-                serviceDescriptor = GetServiceDescriptorList(serviceTypeInsideIEnurmerable);
+                serviceDescriptor = GetServiceDescriptorList(serviceTypeInsideIEnurmerable).Last();
 
                 return GetIEnumerableImplementationInstance(serviceTypeInsideIEnurmerable, serviceDescriptor);
             }
 
-            serviceDescriptor = GetServiceDescriptorList(serviceType);
+            serviceDescriptor = GetServiceDescriptorList(serviceType).Last();
             return GetImplementationInstance(serviceType, serviceDescriptor);
 
 
@@ -124,28 +127,29 @@ namespace DIContainer
             }
             return Instance;
         }
-        private ServiceDescriptor GetServiceDescriptorList(Type serviceType)
+        private List<ServiceDescriptor> GetServiceDescriptorList(Type serviceType)
         {
-            _typeServiceDescriptorDict.TryGetValue(serviceType, out var serviceDescriptor);
+            _typeServiceDescriptorDict.TryGetValue(serviceType, out List<ServiceDescriptor> serviceDescriptor);
 
             if (serviceDescriptor == null && serviceType.IsGenericType)
                 serviceDescriptor = GetServiceDescriptorListFromGeneric(serviceType);
 
             return serviceDescriptor;
         }
-        private ServiceDescriptor GetServiceDescriptorListFromGeneric(Type serviceType)
+        private List<ServiceDescriptor> GetServiceDescriptorListFromGeneric(Type serviceType)
         {
             ServiceDescriptor result;
             var genericTypeDefinition = serviceType.GetGenericTypeDefinition();
-            if (_typeServiceDescriptorDict.TryGetValue(genericTypeDefinition, out ServiceDescriptor descriptor))
+            if (_typeServiceDescriptorDict.TryGetValue(genericTypeDefinition, out List<ServiceDescriptor> descriptor))
             {
 
                 result = new ServiceDescriptor(
                         serviceType,
-                        descriptor.ImplementationType.MakeGenericType(serviceType.GetGenericArguments()),
-                        descriptor.Lifetime);
+                        descriptor.Last().ImplementationType.MakeGenericType(serviceType.GetGenericArguments()),
+                        descriptor.Last().Lifetime);
+                descriptor.Add(result);
 
-                return result;
+                return descriptor;
             }
             return null;
         }

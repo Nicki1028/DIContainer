@@ -12,7 +12,7 @@ namespace DIContainer
         public TPresenter Create<TPresenter, TView>(TView view)
         {
             Type type = typeof(TPresenter);
-            ServiceDescriptor serviceDescriptor = NickiCollection.TypeServiceDescriptorDict[type];
+            ServiceDescriptor serviceDescriptor = NickiCollection.TypeServiceDescriptorDict[type].Last();
             TPresenter presenter = (TPresenter)Activator.CreateInstance(serviceDescriptor.ImplementationType, view);
             return presenter;
 
