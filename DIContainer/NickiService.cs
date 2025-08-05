@@ -213,7 +213,6 @@ namespace DIContainer
                 }
 
 
-
                 if (type.CustomAttributes.Any(x => x.AttributeType == typeof(Signleton)))
                 {
                     if (type.BaseType != null && type.BaseType != typeof(Object))
