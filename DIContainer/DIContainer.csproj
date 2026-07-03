@@ -108,18 +108,15 @@
   <ItemGroup>
     <Compile Include="Attributes\Signleton.cs" />
     <Compile Include="Attributes\Transient.cs" />
-    <Compile Include="BMW.cs" />
-    <Compile Include="Car.cs" />
-    <Compile Include="CarNum.cs" />
-    <Compile Include="Cartype.cs" />
+    <Compile Include="ComponentFactory.cs" />
     <Compile Include="GetServiceExtention.cs" />
+    <Compile Include="IComponentFactory.cs" />
     <Compile Include="PresenterFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NickiService.cs" />
     <Compile Include="NickiCollection.cs" />
     <Compile Include="ServiceProviderbyNicki.cs" />
-    <Compile Include="Toyota.cs" />
     <Compile Include="TypeExtension.cs" />
   </ItemGroup>
   <ItemGroup>

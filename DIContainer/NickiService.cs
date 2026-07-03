@@ -23,6 +23,7 @@ namespace DIContainer
         {
             Collection = new NickiCollection();
             AddSingleton<PresenterFactory>();
+            AddSingleton<IComponentFactory,ComponentFactory>();
         }
 
         public void AddSingleton<T, T2>() where T : class where T2 : class, T
@@ -32,6 +33,10 @@ namespace DIContainer
         public void AddSingleton<T>() where T : class
         {
             Add<T>(ServiceLifetime.Singleton);
+        }
+        public void AddSingleton<T>(Func<IServiceProvider, T> factory) where T : class
+        {
+            Add<T>(ServiceLifetime.Singleton, factory);
         }
         public void AddTransient<T>(Func<IServiceProvider, T> factory) where T : class
         {
@@ -44,13 +49,7 @@ namespace DIContainer
         public void AddTransient<T>() where T : class
         {
             Add<T>(ServiceLifetime.Transient);
-        }
-        public void AddSingleton<T>(Func<IServiceProvider, T> factory) where T : class
-        {
-            Add<T>(ServiceLifetime.Transient, factory);
-        }
-
-
+        }    
         public void Add<T, T2>(ServiceLifetime serviceLifetime) where T : class where T2 : class
         {
             Type serviceType = typeof(T);
@@ -138,7 +137,6 @@ namespace DIContainer
         public void AddLogging(Action<ILoggingBuilder> configure)
         {
             Collection.AddLogging(configure);
-
         }
         public IServiceProvider BuildServiceProvider()
         {
@@ -150,22 +148,18 @@ namespace DIContainer
         {
             return BuildServiceProvider().GetService<T>();
         }
-
         public int IndexOf(ServiceDescriptor item)
         {
             throw new NotImplementedException();
         }
-
         public void Insert(int index, ServiceDescriptor item)
         {
             throw new NotImplementedException();
         }
-
         public void RemoveAt(int index)
         {
             throw new NotImplementedException();
         }
-
         public void Add(ServiceDescriptor item)
         {
             if (!NickiCollection.TypeServiceDescriptorDict.ContainsKey(item.ServiceType))
@@ -178,27 +172,22 @@ namespace DIContainer
                 NickiCollection.TypeServiceDescriptorDict[item.ServiceType].Add(item);
             }
         }
-
         public void Clear()
         {
             throw new NotImplementedException();
         }
-
         public bool Contains(ServiceDescriptor item)
         {
             throw new NotImplementedException();
         }
-
         public void CopyTo(ServiceDescriptor[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
-
         public bool Remove(ServiceDescriptor item)
         {
             throw new NotImplementedException();
         }
-
         public IEnumerator<ServiceDescriptor> GetEnumerator()
         {
             throw new NotImplementedException();

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DIContainer
 {
-    public class CarNum
+    public interface IComponentFactory
     {
-        public int carnum { get; set; }
+        T2 CreateComponent<T, T2>() where T2 : T;
     }
 }

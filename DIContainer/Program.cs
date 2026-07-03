@@ -25,23 +25,18 @@ namespace DIContainer
             //serviseCollection.Add<Car, BMW>(EnumAddType.Transient, configure =>
             //{
             //    configure.Id = 1;
-
-
             //});
-            ////serviseCollection.Add<Car>(EnumAddType.Transient, () =>
-            ////{
-            ////    BMW bMW = new BMW();
-            ////    bMW.Id = 2;
-            ////    return bMW;
-            ////});
+            //serviseCollection.Add<Car>(EnumAddType.Transient, () =>
+            //{
+            //    BMW bMW = new BMW();
+            //    bMW.Id = 2;
+            //    return bMW;
+            //});
 
             //Car BMW = (Car)serviseCollection.GetData<Car>();
-
             //Console.WriteLine(BMW.Id);
             //BMW.ShowInfo();
             //Console.ReadKey();
-
-            //ServiceCollection serviceCollection = new ServiceCollection();
 
             //使用Activator.CreateInstance創建建構元有一層其他類別
 
@@ -55,13 +50,6 @@ namespace DIContainer
                 //使用 NLog 作為 logging provider
                 x.AddNLog(config);
             });
-
-            service.Add<Cartype>(ServiceLifetime.Singleton);
-            provider = service.BuildServiceProvider();
-            ILogger logger = provider.GetService<ILogger<Cartype>>();
-            logger.Log(LogLevel.Information, "DI注入");
-            Cartype mainForm = provider.GetService<Cartype>();
-
 
             Console.WriteLine("執行結束");
           

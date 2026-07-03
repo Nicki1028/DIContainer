@@ -20,7 +20,7 @@ namespace DIContainer
         // 1.要改成允許放入多個子類別
         // 2.自動註冊(利用Attribute自動註冊) / MVP版本的註冊
         public Dictionary<Type, List<ServiceDescriptor>> _typeServiceDescriptorDict;
-        public Dictionary<Type, object> _singletoninstance = new Dictionary<Type, object>();
+        public Dictionary<ServiceDescriptor, object> _singletoninstance = new Dictionary<ServiceDescriptor , object>();
         public ServiceProviderbyNicki(Dictionary<Type, List<ServiceDescriptor>> typeServiceDescriptorDict)
         {
             _typeServiceDescriptorDict = typeServiceDescriptorDict;
@@ -31,14 +31,23 @@ namespace DIContainer
             if (serviceType.IsEnumerable())
             {
                 var serviceTypeInsideIEnurmerable = serviceType.GetGenericArguments()[0];
-                serviceDescriptor = GetServiceDescriptorList(serviceTypeInsideIEnurmerable).Last();
+                if (_typeServiceDescriptorDict.TryGetValue(serviceTypeInsideIEnurmerable, out List<ServiceDescriptor> serviceDescriptorList))
+                {
+                    Type list = typeof(List<>);
+                    Type listgenerictype = list.MakeGenericType(serviceTypeInsideIEnurmerable);
+                    IList genericInstance = (IList)Activator.CreateInstance(listgenerictype);
 
-                return GetIEnumerableImplementationInstance(serviceTypeInsideIEnurmerable, serviceDescriptor);
+                    foreach (ServiceDescriptor serviceDescriptor1 in serviceDescriptorList)
+                    {
+                        object implementInstance = GetImplementationInstance(serviceTypeInsideIEnurmerable, serviceDescriptor1);
+                        genericInstance.Add(implementInstance);
+                    }
+                    return genericInstance;
+                }              
             }
-
             serviceDescriptor = GetServiceDescriptorList(serviceType).Last();
             return GetImplementationInstance(serviceType, serviceDescriptor);
-
+        }
 
             //var list = _typeServiceDescriptorDict.ToList();
 
@@ -54,7 +63,7 @@ namespace DIContainer
             //Logger<Cartype> logger = (Logger<Cartype>)Activator.CreateInstance(list[6].Value.ImplementationType.MakeGenericType(new Type[] { typeof(Cartype) }));
             //logger.Log(LogLevel.Information, "DI注入");                    
 
-        }
+        
         private IList CreateGenericList(Type type)
         {
             // 獲取List<>類型
@@ -109,19 +118,19 @@ namespace DIContainer
 
             if (descriptor.Lifetime == ServiceLifetime.Singleton)
             {
-                if (!_singletoninstance.TryGetValue(serviceType, out Instance))
+                if (!_singletoninstance.TryGetValue(descriptor, out Instance))
                 {
                     if (descriptor.ImplementationFactory != null)
                     {
                         Instance = descriptor.ImplementationFactory.Invoke(this);
-                        _singletoninstance[serviceType] = Instance;
+                        _singletoninstance[descriptor] = Instance;
                     }
                     else
                     {
                         MethodInfo method = typeof(ServiceProviderbyNicki).GetMethod("CreateInstance");
                         MethodInfo methodgeneric = method.MakeGenericMethod(descriptor.ImplementationType);
                         Instance = methodgeneric.Invoke(this, null);
-                        _singletoninstance[serviceType] = Instance;
+                        _singletoninstance[descriptor] = Instance;
                     }
                 }
             }

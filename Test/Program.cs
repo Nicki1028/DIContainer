@@ -22,12 +22,10 @@ namespace Test
             //Application.Run(new Form1());
 
             NickiService service = new NickiService();
-
-                      
+                 
             //service.Add<PresenterFactory>(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton); // 註冊 ProductPresenterFactory        
             
             service.Add<IProductPresenter,ProductPresenter>(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient);
-
             service.Add<Form, Form1>(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient);
             IServiceProvider provider = service.BuildServiceProvider();
             Form form = provider.GetService<Form>();

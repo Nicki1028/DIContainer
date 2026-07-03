@@ -14,9 +14,9 @@ namespace DIContainer
 
         public NickiCollection()
         {
-            TypeServiceDescriptorDict = new Dictionary<Type, List<ServiceDescriptor>>();
-            
+            TypeServiceDescriptorDict = new Dictionary<Type, List<ServiceDescriptor>>();           
         }
+
 
         public ServiceDescriptor this[int index] { get => GetDescriptorDict(index); set => throw new NotImplementedException(); }
 
