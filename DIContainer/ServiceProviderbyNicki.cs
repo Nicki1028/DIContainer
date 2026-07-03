@@ -75,7 +75,6 @@ namespace DIContainer
             // 創建List<type>的實例
             return (IList)Activator.CreateInstance(constructedListType);
         }
-
         public static void AddElementToList(IList list, object element, Type type)
         {
             // 獲取List<>.Add方法
@@ -84,7 +83,6 @@ namespace DIContainer
             // 將element轉型成type並加入list
             method.Invoke(list, new[] { element });
         }
-
         private object GetIEnumerableImplementationInstance(Type serviceType, ServiceDescriptor serviceDescriptor)
         {
             if (serviceDescriptor == null)
@@ -162,7 +160,6 @@ namespace DIContainer
             }
             return null;
         }
-
         public T CreateInstance<T>()
         {
             Type t = typeof(T);

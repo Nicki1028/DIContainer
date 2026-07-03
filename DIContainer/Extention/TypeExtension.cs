@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DIContainer
 {
-    internal static class TypeExtension
+    public static class TypeExtension
     {
         public static bool IsEnumerable(this Type type)
         {
