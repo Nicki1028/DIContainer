@@ -6,8 +6,10 @@ Nicki DI是一個以學習與實踐為目的所開發的輕量級Dependency Inje
 生命週期管理（Lifetime Management）以及建構式注入（Constructor Injection）。
 除了基本的 DI 功能外，也提供Attribute自動註冊、MVP架構整合與Component Factory等擴充能力。
 
-## 功能特色
+## 架構圖
+![Architecture](images/structure.png)
 
+## 功能特色
 - 建構式依賴注入（Constructor Injection）
 - Singleton / Transient 生命週期管理
 - Attribute 自動註冊
@@ -15,6 +17,3 @@ Nicki DI是一個以學習與實踐為目的所開發的輕量級Dependency Inje
 - MVP 架構整合
 - 自訂 Presenter Factory
 - 自訂 Component Factory
-
-## 架構圖
-![Architecture](images/structure.png)
